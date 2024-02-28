@@ -1,22 +1,24 @@
 package ru.job4j.rest.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.job4j.rest.model.User;
 import ru.job4j.rest.service.UserService;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
+@Slf4j
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/user")
@@ -25,7 +27,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<User> get(@PathVariable int userId) {
+    public ResponseEntity<User> get(@PathVariable Long userId) {
         return userService.findById(userId)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -33,13 +35,23 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<User> save(@RequestBody User user) {
-        return ResponseEntity.ok(userService.save(user));
+        userService.save(user);
+        var uri = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(user.getId())
+                .toUri();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .location(uri)
+                .body(user);
     }
 
     @PutMapping
-    @ResponseStatus(HttpStatus.OK)
-    public void update(@RequestBody User user) {
-        userService.save(user);
+    public ResponseEntity<Void> update(@RequestBody User user) {
+        if (userService.update(user)){
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PatchMapping
@@ -49,8 +61,11 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeById(@PathVariable int userId) {
-        userService.deleteById(userId);
+    public ResponseEntity<Void> removeById(@PathVariable long userId) {
+        if (userService.deleteById(userId)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+//        return ResponseEntity.notFound().build();
     }
 }

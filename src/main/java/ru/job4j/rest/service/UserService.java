@@ -17,16 +17,16 @@ public class UserService {
         return repository.save(user);
     }
 
-    public void update(User user) {
-        repository.save(user);
+    public boolean update(User user) {
+        return repository.update(user) > 0L;
     }
 
-    public Optional<User> findById(int id) {
+    public Optional<User> findById(Long id) {
         return repository.findById(id);
     }
 
-    public void deleteById(int id) {
-        repository.deleteById(id);
+    public boolean deleteById(Long id) {
+        return repository.delete(id) > 0L;
     }
 
     public List<User> findAll() {
