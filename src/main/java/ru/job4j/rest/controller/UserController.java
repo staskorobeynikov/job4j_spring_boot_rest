@@ -1,23 +1,18 @@
 package ru.job4j.rest.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.job4j.rest.model.User;
 import ru.job4j.rest.service.UserService;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-
+@Validated
 @Slf4j
 @AllArgsConstructor
 @RestController
@@ -27,7 +22,10 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<User> get(@PathVariable Long userId) {
+    public ResponseEntity<User> get(@PathVariable("userId")
+                                    @NotNull
+                                    @Min(value = 1, message = "номер ресурса должен быть 1 и более")
+                                    Long userId) {
         return userService.findById(userId)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());

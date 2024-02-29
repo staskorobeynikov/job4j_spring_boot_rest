@@ -20,7 +20,8 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = { DataIntegrityViolationException.class })
-    public void illegalArgumentException(Exception e, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void catchDataIntegrityViolationException(Exception e, HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         Map<String, String> details = new HashMap<>();
         details.put("message", e.getMessage());
         details.put("type", String.valueOf(e.getClass()));
