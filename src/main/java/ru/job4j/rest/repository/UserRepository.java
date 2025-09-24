@@ -8,7 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.job4j.rest.model.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    @Modifying
+    @Transactional
+    @Modifying(clearAutomatically = true)
     @Query("DELETE FROM User u WHERE u.id=:pId")
     int delete(@Param("pId") Long id);
 
