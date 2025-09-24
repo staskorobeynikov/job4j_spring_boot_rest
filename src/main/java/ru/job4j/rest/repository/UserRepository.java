@@ -9,17 +9,17 @@ import ru.job4j.rest.model.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
-    @Query("delete from User u where u.id=:pId")
+    @Query("DELETE FROM User u WHERE u.id=:pId")
     int delete(@Param("pId") Long id);
 
 
     @Transactional
     @Modifying
     @Query("""
-        update User u
-        set u.username = :#{#user.username},
+        UPDATE User u
+        SET u.username = :#{#user.username},
         u.created = :#{#user.created}
-        where u.id=:#{#user.id}
+        WHERE u.id=:#{#user.id}
         """)
     int update(@Param("user") User user);
 }

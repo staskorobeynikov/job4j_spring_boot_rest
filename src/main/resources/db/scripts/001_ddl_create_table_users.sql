@@ -1,5 +1,6 @@
-create table if not exists users (
-                        id serial primary key not null,
-                        username varchar(2000),
-                        created timestamp
+CREATE TABLE IF NOT EXISTS users
+(
+    id       BIGSERIAL PRIMARY KEY,
+    username VARCHAR(2000),
+    created  TIMESTAMP
 );
